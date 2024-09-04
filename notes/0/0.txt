@@ -56,6 +56,18 @@ JIT - just in time compilation.
 
 Flashbacks to computer organization:
 
+STDIN, STDOUT, STDERR.
+
+Exit status.
+
+C has no provisions for I/O, those are in libraries.
+
+However we have exit status.
+
+`$?` is the exit status environment variable.
+
+
+
 To be continued.
 
 
