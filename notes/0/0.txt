@@ -12,9 +12,14 @@ Destination language doesn't have to be assembly language. It can be just any ot
 
 But what we usually want is to translate from our language to machine code.
 
-For that, there are usual compilation steps.
+How to write first compiler if you have no language to write it in?
 
-For C programming language those are:
+Intro to bootstrapping. More later.
+
+What is the word in the alphabet? For C, '{' is a word, '<' is a word, '<=' is a word.
+
+
+These are usual compilation steps for the C programming language:
 
 # Preprocessor
 
