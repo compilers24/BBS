@@ -1,0 +1,76 @@
+Computers talk machine code.
+Different computers talk different machine code.
+
+We looked at some examples of x86_64 and ARM code represented by assembly language mnemonics.
+
+Assembly language is a human friendly representation of machine code.
+Assembly language is of course different for different CPUs.
+
+Compilers translate source language to destination language.
+
+Destination language doesn't have to be assembly language. It can be just any other language. In that case we call compiler: transpiler.
+
+But what we usually want is to translate from our language to machine code.
+
+For that, there are usual compilation steps.
+
+For C programming language those are:
+
+# Preprocessor
+
+Usually named 'cpp'.
+Processes macros, definitions.
+Writes preprocessed file to STDOUT.
+
+At this stage as input we have .c file, as output we get .i file.
+
+# Compiler itself
+
+Usually named 'cc'. 'cc' can be a symlink (pointer/shortcut) to different compilers: gcc on Linux, clang on MacOS.
+
+As input it gets .i file, as output it generates .s file.
+.s is a standard extension for assembly programs.
+
+# Assembler
+usually named 'as'.
+Translates (compiles) .s assembly source to object file with .o extension.
+
+# Linker
+Links object file with extension .o to the resulting executable.
+
+Questions to revisit: how do we know it is executable? Why it gets executed by the OS?
+
+Why we don't generate machine code directly?
+
+Interpreters do not translate source code written in one language to source code written in other language or assembly. Interpreters read the source code and do what was read.
+
+Questions to revisit:
+Intermediate code, CIL, byte code, Java byte code, Python byte code, M-code, P-code.
+
+JIT - just in time compilation.
+
+Flashbacks to computer organization:
+
+To be continued.
+
+
+
+--------------------------------------------
+
+Below are also some useful links for basic-level things that we need during the labs.
+
+linux terminal very basic commands to use when you are connected to server with ssh:
+https://www.geeksforgeeks.org/linux-commands-cheat-sheet/
+
+github general terms, what they mean, basic commands:
+https://www.freecodecamp.org/news/guide-to-git-github-for-beginners-and-experienced-devs/
+
+vim simple tutorial here (it would be great if you looked this through before the next Lab), vim cheat sheets are also attached.
+https://www.tutorialspoint.com/vim/vim_getting_familiar.htm
+
+assembly very useful instructions, when you need one, you may look it up here:
+https://www.felixcloutier.com/x86/
+
+assembly syscalls:
+https://hackeradam.com/x86-64-linux-syscalls/
+
