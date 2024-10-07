@@ -1,0 +1,208 @@
+fortran:
+
+DO 50 I = 1, 10 (repeat ten times, when I changes from 1 to 10)
+
+same is
+
+DO50J=1,10  (whitespaces do not matter).
+
+defining variables is not necessary.
+If the first letter is I, J, K, L, M, N, then it's an integer type variable.
+
+else - REAL.
+
+DO 50 I = 1. 10  (no compilation error. looks like this was the reason of the venus spacecraft incident).
+
+static memory.
+recoursion is not possible.
+
+-------------
+BASIC
+
+10 CLS
+20 PRINT "aaa"
+
+
+------------
+
+
+from asm to C
+
+includes.
+
+macros.
+
+type checks
+
+language tree from here:
+https://oberoncore.ru/_media/library/tkachov_less_is_more_why_oberon_beats_mainstream.pdf
+
+quantity of lexems as a measure of language complexity.
+
+safety
+
+>There are two ways of constructing a software design: One way is to make it so simple that there are obviously no deficiencies, and the other way is to make it so complicated that there are no obvious deficiencies. The first method is far more difficult. It demands the same skill, devotion, insight, and even inspiration as the discovery of the simple physical laws which underlie the complex phenomena of nature.
+
+https://en.wikiquote.org/wiki/C._A._R._Hoare
+
+heartbleed example
+
+https://github.com/openssl/openssl/commit/bd6941cfaa31ee8a3f8661cb98227a5cbcc0f9f3
+
+https://stackoverflow.com/questions/23089964/is-the-heartbleed-bug-a-manifestation-of-the-classic-buffer-overflow-exploit-in
+
+xkcd explanation: https://xkcd.com/1354/
+https://www.explainxkcd.com/wiki/index.php/1354:_Heartbleed_Explanation
+
+https://xkcd.com/1353/ - not really related.
+https://www.explainxkcd.com/wiki/index.php/1353:_Heartbleed
+
+context free grammar example.
+
+a = *b;
+x+++++y;
+
+oberon vs c++
+http://www.modulaware.com/mdlt49.htm
+
+
+misra:
+
+>I took the 142 rules of the MISRA-C:2004 "Guidelines for the use of the C
+language in critical systems" and applied them to Oberon-07. I discovered
+that more than 70% of the rules are NOT required when programming in
+Oberon-07. They are either already enforced by the language or are not
+applicable.
+
+https://lists.inf.ethz.ch/pipermail/oberon/2018/012534.html
+
+---------------------
+Examples of MISRA rules that are not applicable to Oberon-07:
+
+  Rule 14.4: The goto statement shall not be used. (Oberon-07 does not have
+GOTO)
+
+  Rule 14.5: The continue statement shall not be used. (Oberon-07 does not
+have CONTINUE)
+
+Examples of MISRA rules that are enforced by the design of Oberon-07:
+
+  Rule 14.7: A function shall have a single point of exit at the end of the
+function.
+
+  Rule 16.6: The number of arguments passed to a function shall match the
+number of parameters.
+
+The remaining 30% of MISRA rules would need to be followed if using
+Oberon-07 for critical systems. They include:
+
+  Rule 2.4 (advisory): Sections of code should not be "commented out".
+
+  Rule 20.4: Dynamic heap memory allocation shall not be used.
+------------------------------------
+
+Context free grammar and context free languages.
+
+* - multiplication
+* - dereference of pointer
+
+x+++++y
+
+-----------------------
+array and buffer bound checks.
+
+arr.c, arr.Mod
+-----------------------
+
+functions:
+
+Ada in, out, inout.
+
+you use VAR because you want to get the pointer to the array, instead of copying the whole array to the procedure’s stack.
+
+http://smalllinux.sourceforge.net/oberon/oakwood.htm
+
+>5.13 Read only VAR parameters.
+
+>There have been many requests to make ARRAY and RECORD parameters read-only to achieve the efficiency of passing by reference without the associated possibility for corruption of the calling parameter.  An attempt to make an assignment to any component of such a read only parameter is a compile-time error.  Such parameters could be marked with the standard read only "-" symbol.  For example:
+
+```
+	PROCEDURE Print (theText-: ARRAY OF CHAR) ;
+```
+
+>Discussions with ETH suggest this is really a compiler code optimisation issue and on this basis it is recommended that this extension is not implemented.
+
+
+so the suggestion was that if you want to make sure the array won’t be modified, you use “-” mark.
+
+what about optimizations, they say, that in principle compiler can understand that you did not write to the passed array, and instead of passing it to the procedure by value (by copying the whole array), pass it by reference (by copying only pointer to it).
+
+i disagree, because i believe, it is important to mark your intentions. if you intent to make sure you pass it read-only, you pass it with “-”, if you intent to pass it read-write, you pass it just with VAR. passing with ‘OUT’, when you cannot read it, but can only write to it is not supported in Oberon.
+
+
+
+Encapsulation, includes, C approach, C++/C# namespaces, Java classes vs modules.
+TP, Modula-2, Oberon approaches to modules/interface/implementation.
+
+>C++ simulates modules via the preprocessor
+
+>C++ does not have a module concept in the language proper but simulates it in the well-known way via the C-preprocessor (cpp) and appropriate programming conventions (header files). The global name space that C++ inherited from C does not preclude name clashes during the linking step. To avoid this problem, classes are sometimes used to simulate the name scope of modules. In the case of interrelated classes or procedures which refer to more than one class, so- called friends must be used, which are sort of a scope-goto - a construct that allows to circumvent the usual scoping rules of the language. Friends make names visible where they would not be visible otherwise. Since this mechanism is still unsatisfying for large software systems, extensions to the scoping mechanisms - namespaces - are beeing discussed by the C++ standardization committee [5]. However, namespaces still depend on the C-preprocessor, thus, they cannot be regarded as a proper module concept in the language.
+
+>Another often cited criticism of C++, the missing initialization order, also solved by Oberon's modules. In contrast of cpp's include mechanism, the import relationship forbids cycles. Thus, the imported modules can always be initialized before their clients.
+
+>For system-level programming, Oberon offers the pseudo module SYSTEM, which provides implementation and machine dependent operations. Modules which import SYSTEM are inherently unportable and unsafe but easily identified by the word SYSTEM in their import list. C++ allows the usage of system level operations without specially marking such programs. When porting programs from one machine to another, this might lead to unpleasant surprises and long debugging sessions.
+
+http://www.modulaware.com/mdlt49.htm
+
+C# nested namespaces prevent explicit usage of names from those namespaces:
+example: hello.cs; print.cs
+
+
+Modules vs. Java packages
+
+>Java has the notion of a package. Classes belonging to the same package may access non-public members of each other. The same can be said of Modula-2 or Oberon Modules. Within a module boundary, no restriction exists, while only explicitly exported types, variables and procedures can be accessed from outside a module.
+
+>But there is a fundamental difference between the Modules and Java packages. The Module is also the basic compilation unit. Thus when you collect things into a module, you know, that they are protected from outside interferences. Java choose to elect the class as basic compilation unit. Thus everybody may add classes to a package, and you loose the protection against outsiders.
+
+http://claudio.ch/Notebook/pl.html
+
+
+
+Templ again:
+
+>Both Oberon and C++ rely on the notion of strong typing. The approach to that, however, is quite contrary. In Oberon (as in Pascal) a variable is associated with an arbitrary complex type, in C++ (as in C) a type is associated with an arbitrary complex designator (lvalue). This lvalue acts as a prototype for the usage of the variable and defines the variable's type implicitly. By inverting the declaration and isolating the variable, the variable's type can be reconstructed. A concrete example is the definition of a pointer v to a structure x as in:
+
+```
+        struct x *v;
+```
+
+>This means that the lvalue *v is of type struct x. '*' denotes dereferenciation, therefore the type of v can be deduced as pointer to struct x. In Oberon one would write
+
+```
+        VAR v: POINTER TO x;
+```
+
+>The variable v in this declaration is already isolated. In case of more complex declarations, Oberon's approach is definitely simpler and more regular. Eventually, in both languages a type is associated with every variable, which defines the set of values and applicable operators. By that, many erroneous usages of variables and procedures can be detected before program execution and help to avoid mysterious program crashes. 
+
+
+-----------------------------------
+
+https://www.gnu.org/fun/jokes/unix-hoax.html
+
+When we found others were actually
+    trying to create real programs with A, we quickly added additional
+    cryptic features and evolved into B, BCPL and finally C. We stopped
+    when we got a clean compile on the following syntax:
+
+    for(;P("\n"),R--;P("|"))for(e=C;e--;P("_"+(*u++/8)%2))P("| "+(*u/4)%2);
+
+    To think that modern programmers would try to use a language that
+    allowed such a statement was beyond our comprehension!  We actually
+    thought of selling this to the Soviets to set their computer science
+    progress back 20 or more years. Imagine our surprise when AT&&T and
+    other US corporations actually began trying to use Unix and C!
+
+
+memory management:
+
+gc, smart pointers, manual.

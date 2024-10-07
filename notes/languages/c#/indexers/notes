@@ -1,0 +1,177 @@
+
+
+indexers allow to access objects like arrays
+
+
+this is implemented by implicitly calling get and set functions:
+
+for instance, access to the bits of 32bit integer can be masked as access to the array.
+```
+public struct BitSet
+{
+  int bits;                   //our integer
+  public bool this[ind i]     //indexer
+  {
+    get
+    {
+      return 0<=i && i<32? (bits & 1<<i) !=0 : false; 
+    }
+    set
+    {
+      if (i<0 || i>31) return;
+      if (value) bits |= 1<<i; else bits &= ~(1<<i);
+    }
+  }
+}
+```
+now we can use it like this:
+
+```
+  BitSet b = new BitSet();         //our variable
+
+  // set all bits to 1
+  for (int i=0; i<32; i++)
+      b[i] = true;
+
+...
+
+   if ( b[i] ) ...                // checking i-th bit
+...
+```
+
+what we have in definiton of BitSet:
+
+* && - conditional 'and'
+* &  - bitwise 'and'
+* << - left shift
+* != - not equal
+* ?: - if logical expression before ? is true then operation result gets calculated by the expression written before ":", otherwise - after it.
+* || - logical 'or'
+* |= - addition with bitwise 'or' (note similarity to '!=')
+* &= - assignment with bitwise 'and'
+* ~  - bitwise 'not'.
+
+
+```
+x & y    // bitwise AND, 0101 & 0011 = 0001
+x | y    // bitwise OR,  0101 | 0011 = 0111
+
+x && y   // true if both x and y are true
+x || y   // true if either x or y are true
+```
+
+
+identifier 'value' represents value passed to the function set.
+
+obviously, the same can be done without indexers.
+
+```
+  public struct BitSet
+  {
+    int bits;
+    public bool get(int i)
+    {
+       return 0<=i && i<32 ? (bits & 1<<i) != 0 : false;
+    }
+    public void set(int i, bool value)
+    {
+      if (i<0 || i>31) return;
+      if (value) bits |= 1<<i; else bits &= ~(1<<i);
+    }
+
+  }
+
+```
+
+setter and getter did not change, but those are regular methods now.
+we cannot use square brackets to access bits.
+
+```
+  BitSet b = new BitSet();
+
+  // set all bits to 1
+  for (int i=0; i<32; i++)
+    b.set(i, true);
+...
+  if (b.get(i)) ...         //checking i-th bit
+...
+```
+
+
+may be, the reason for indexers was the desire of the c# designer(s) to make access to strings more familiar. because strings in c# are objects, not arrays.
+
+indexers are the reason, why it is possible to access i-th element of string s as s[i].
+
+in java, where strings are objects too, in order to get a character we use method
+
+```
+s.charAt(i)
+```
+
+pros and cons of properties and indexers.
+
+both essentially don't provide new features.
+
+pros
+
+* simpler notation
+
+  access to the object member, read and write to it are written like access to the field (in case of properties) and access to an array element (in case of indexers).
+
+ name yours.
+
+cons
+
+* language and compiler become more complicated.
+  with properties and indexers we get more new rules.
+  c# handbook has 8 pages dedicated to properties.
+
+* when using properties and indexers, programmer may have no clue, which is the cost behind those setters and getters, which may lead to writing inefficient code.
+
+  for instance, using indexer to access elements of the linked list by its number(c# documentation uses this example!), in case of the long enough list, is much less efficient, than accessing array element, though it looks similar.
+
+  using indexes in order to access elements of the linked list is also not efficient, but you are sort of 'encouraged' to do so.
+
+* it is harder to understand the program.
+  by looking at the text of the program, it is harder to understand
+  if we work with the field or the property,
+  if we work with the array or the indexer.
+
+  again, if we work with the field, we only can read/write to it.
+  if we work with the property, we don't know what is done inside the reader/writer function.
+
+  same is true about arrays and indexers.
+
+  the example:
+
+```
+  int i, s = 0;
+
+  for ( i=1; i<100; i++ ) a[i] = i;
+  for ( i=1; i<100; i++ ) s += a[i];
+  System.Console.WriteLine(s);
+
+```
+
+looks like we assign numbers to the array elements
+and then calculate the sum of those numbers.
+
+however, may be a is an instance of this class:
+
+```
+class Array
+{
+
+  public int this[int i]
+  {
+    get
+    {
+      return i*i;          
+    }
+    set {}
+  }
+}
+
+
+
+```

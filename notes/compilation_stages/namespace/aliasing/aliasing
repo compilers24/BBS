@@ -1,0 +1,36 @@
+
+https://stackoverflow.com/questions/505262/c-sharp-namespace-alias-whats-the-point
+
+using WinformTimer = System.Windows.Forms.Timer;
+using ThreadingTimer = System.Threading.Timer;
+
+
+24
+
+I use it when I've got multiple namespaces with conflicting sub namespaces and/or object names you could just do something like [as an example]:
+
+```
+using src = Namespace1.Subspace.DataAccessObjects;
+using dst = Namespace2.Subspace.DataAccessObjects;
+```
+
+...
+
+
+```
+src.DataObject source = new src.DataObject();
+dst.DataObject destination = new dst.DataObject();
+```
+
+Which would otherwise have to be written:
+
+```
+Namespace1.Subspace.DataAccessObjects.DataObject source =
+  new Namespace1.Subspace.DataAccessObjects.DataObject();
+
+Namespace2.Subspace.DataAccessObjects.DataObject dstination =
+  new Namespace2.Subspace.DataAccessObjects.DataObject();
+```
+
+It saves a ton of typing and can be used to make code a lot easier to read.
+

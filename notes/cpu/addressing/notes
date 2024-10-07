@@ -1,0 +1,52 @@
+direct addressing modes
+
+  immediate am
+  use the specified value
+
+  movq $23, %rdi
+
+  register am
+  use the value in the specified register
+
+  movq %rcx, %rdx
+
+  direct memory am
+  use the value at the specified memory address.
+
+  movq 0x555, %rdi
+
+indirect addressing modes
+
+  register indirect am
+  the address is stored in the specified register.
+
+  movq (%rax), %rdi
+
+  register indexed am
+  the address is a contstant offset of the value in the specified register
+
+  movq 23(%rax), %rdi
+
+  instruction-pointer relative am
+  the address is indexed relative to %rip
+
+  movq 23(%rip), %rdi
+
+the most general form of indirect addrressing supported by x86_64 is the
+        
+            base indexed scale displacement mode.
+
+
+            movq 23(%rdi, %rdx,  8), %rax
+                 |   |      |    |
+       Displacement Base  Index Scale
+
+this mode refers to the address
+
+Base + Index * Scale + Displacement
+
+Scale: either 1, 2, 4 or 8
+Base and Index: GPR
+Displacement: 8, 16, or 32 bit value.
+
+if unspecified, Index and Displacement default to 0, and Scale defaults to 1.

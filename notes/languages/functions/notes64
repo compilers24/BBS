@@ -1,0 +1,18 @@
+On x86-64 Linux, %rbp, %rbx, %r12, %r13, %r14, and %r15 are callee-saved, as (sort of) are %rsp and %rip. The other registers are caller-saved.
+
+1st argument: %rdi
+2nd           %rsi
+3rd           %rdx
+4th           %rcx
+5th           %r8
+6th           %r9
+
+rest to stack.
+
+(%xmm0-%xmm7 are used to pass floating point arguments)
+
+https://wiki.osdev.org/System_V_ABI
+
+https://courses.cs.washington.edu/courses/cse378/10au/sections/Section1_recap.pdf
+
+https://cs61.seas.harvard.edu/site/2018/Asm2/

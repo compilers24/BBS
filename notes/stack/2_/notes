@@ -1,0 +1,23 @@
+
+from test.s we see
+that
+
+buffer1 is located at -13(%rbp)
+
+we also know that return address is located at 8(%rbp)
+
+ret addr     8(%rbp)
+              (%rbp)
+buffer1    -13(%rbp)
+
+so 13 + 8 is address of return address.
+
+
+now lets disassemble main
+gdb test
+disassemble main
+
+we see that offset from the next instruction after return
+and next instruction is 7
+
+

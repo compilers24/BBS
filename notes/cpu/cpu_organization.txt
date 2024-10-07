@@ -1,0 +1,241 @@
+ ⢀⣀ ⠄ ⣀⡀ ⢀⡀ ⡇ ⢀⡀   ⢀⣀ ⢀⣀ ⢀⣀ ⡀⢀ ⣀⣀  ⡇ ⢀⣀ ⣰⡀ ⢀⡀ ⡀⣀   ⣇⡀ ⢀⣀ ⢀⣀ ⢀⡀ ⢀⣸
+ ⠭⠕ ⠇ ⠇⠸ ⣑⡺ ⠣ ⠣⠭   ⠣⠼ ⠣⠤ ⠣⠤ ⠣⠼ ⠇⠇⠇ ⠣ ⠣⠼ ⠘⠤ ⠣⠜ ⠏    ⠧⠜ ⠣⠼ ⠭⠕ ⠣⠭ ⠣⠼
+
+░█▀▀░█▀█░█░█░░░█▀█░█▀▄░█▀▀░█▀█░█▀█░▀█▀░▀▀█░█▀█░▀█▀░▀█▀░█▀█░█▀█
+░█░░░█▀▀░█░█░░░█░█░█▀▄░█░█░█▀█░█░█░░█░░▄▀░░█▀█░░█░░░█░░█░█░█░█
+░▀▀▀░▀░░░▀▀▀░░░▀▀▀░▀░▀░▀▀▀░▀░▀░▀░▀░▀▀▀░▀▀▀░▀░▀░░▀░░▀▀▀░▀▀▀░▀░▀
+
+(this type of CPU is first used in PDP-8 processor)
+
+* first ALU operand is always stored into the Accumlator
+* second ALU operand is stored either in Register or Memory
+* Accumlator is the default address: after data manipulation the result is
+  stored in the Accumlator.
+* one address instruction is used in this type of organization.
+
+The format of instruction is: Opcode + Address
+
+░▀█▀░█░█░█▀█░█▀▀░█▀▀░░░█▀█░█▀▀░░░▀█▀░█▀█░█▀▀░▀█▀░█▀▄░█░█░█▀▀░▀█▀░▀█▀░█▀█░█▀█░█▀▀
+░░█░░░█░░█▀▀░█▀▀░▀▀█░░░█░█░█▀▀░░░░█░░█░█░▀▀█░░█░░█▀▄░█░█░█░░░░█░░░█░░█░█░█░█░▀▀█
+░░▀░░░▀░░▀░░░▀▀▀░▀▀▀░░░▀▀▀░▀░░░░░▀▀▀░▀░▀░▀▀▀░░▀░░▀░▀░▀▀▀░▀▀▀░░▀░░▀▀▀░▀▀▀░▀░▀░▀▀▀
+
+
+ ⢀⣸ ⢀⣀ ⣰⡀ ⢀⣀   ⣰⡀ ⡀⣀ ⢀⣀ ⣀⡀ ⢀⣀ ⣰⡁ ⢀⡀ ⡀⣀   ⠄ ⣀⡀ ⢀⣀ ⣰⡀ ⡀⣀ ⡀⢀ ⢀⣀ ⣰⡀ ⠄ ⢀⡀ ⣀⡀ ⢀⣀
+ ⠣⠼ ⠣⠼ ⠘⠤ ⠣⠼   ⠘⠤ ⠏  ⠣⠼ ⠇⠸ ⠭⠕ ⢸  ⠣⠭ ⠏    ⠇ ⠇⠸ ⠭⠕ ⠘⠤ ⠏  ⠣⠼ ⠣⠤ ⠘⠤ ⠇ ⠣⠜ ⠇⠸ ⠭⠕
+
+LOAD  X
+STORE Y
+
+or
+
+LDA $42 in case of nmos6502.
+
+
+ ⣎⣱ ⡇  ⡇⢸   ⠄ ⣀⡀ ⢀⣀ ⣰⡀ ⡀⣀ ⡀⢀ ⢀⣀ ⣰⡀ ⠄ ⢀⡀ ⣀⡀ ⢀⣀
+ ⠇⠸ ⠧⠤ ⠣⠜   ⠇ ⠇⠸ ⠭⠕ ⠘⠤ ⠏  ⠣⠼ ⠣⠤ ⠘⠤ ⠇ ⠣⠜ ⠇⠸ ⠭⠕
+
+MULT X   ; A := A * M[X]
+
+I := J + K
+
+LDA J
+ADD K
+STA I
+
+
+
+### advantages
+
+* one of the operands is always held by A: short instructions: less memory
+  usage.
+
+* instruction cycle takes less time because it saves time in instruction
+  fetching from memory.
+
+### disadvantages
+
+* when complex expressions are computed, program size increases do to the
+  usage of many short instructions to execute it. thus memory usage increases.
+* as the number of instructions increases for a program, the execution time
+  also increases.
+
+
+general register based cpu organization
+
+(IBM 360, PDP-11)
+
+the computer uses two or three address fields in the instruction format.
+each address field may specify a register or a memory word.
+if many registers are available (for heavily used variables and intermediate
+results) we can avoid memory references much of the time, thus vastly
+increasing program execution speed and reducing program size.
+
+MULT R1, R2, R3  ; R3 := R1 * R2
+
+MULT R1, R2      ; R2 := R1 * R2
+
+
+## advantages
+* efficiency of CPU increases as(if) large number of registers are used.
+* less memory space is used to store the program since the instructions are
+  written in compact way. (case wtih two operands)
+
+
+## disadvantages
+
+* care should be taken to avoid unnecessary usage of registers. compilers need
+  to be more intelligent.
+* since large numbers of registers are used, extra cost is required for this
+  organization.
+
+## general register CPU organization of two type
+
+* register-memory reference architecture (CPU with less registers)
+
+(x86)
+
+in this organization 1st operand may rezide in memory or register.
+second operand is required to be in register.
+it has two address instruction format.
+
+* register-register reference architecture
+
+(ARM)
+
+ALU operations are performed only on a register data.
+all operands are required in the registers.
+result is also placed in the register.
+it has three address instruction format.
+
+
+## stack based CPU organization
+
+LIFO
+(PDP-11, Intel 8085, HP 3000)
+
+Stack Pointer (SP) register is used to store the address of the topmost element of the stack.
+ALU operations are performed on stack data.
+after manipulation the result is placed in the stack.
+
+
+## data transfer instructions
+
+two main operations: PUSH and POP
+
+* PUSH R1
+
+translates to
+
+  DEC SP         ; SP := SP - 1
+
+  STORE R1, (SP) ; 
+
+
+* POP R1
+
+  LOAD (SP), R1 ;
+  INC  SP       ; SP := SP + 1
+
+
+## ALU instructions
+
+operation type instruction doesn't need the address field in this CPU
+organization.
+operation is performed on the two operands that are on the top of the stack.
+
+SUB
+
+pops the two top data from the stack, substracts, and pushes the result into
+the stack at the top.
+
+## advantages
+
+* efficient computation of complex arithmetic expressions
+* execution of instructions is fast because operand data are stored in
+  consecutive memory locations. (but slower than if stored in registers)
+* length of instruction is short as they do not have address field.
+
+## disadvantages
+* size of the program increases.
+
+uses zero address instructions
+
+________________________
+
+
+X = (A+B)*(C+D)
+
+# zero address instructions
+
+   ______________________________
+   |                            |
+┌─────┐                         |
+│    b│                         |
+└─────┘                         |
+┌─────┐                         |
+│    a│<--------- stack         |
+└─────┘                         |
+                           ┌─────────┐
+                           │  a * b  │
+                           └─────────┘
+
+
+Expression: X = (A+B)*(C+D)
+Postfixed : X = AB+CD+*
+TOP means top of stack
+M[X] is any memory location
+
+
+PUSH	A	     ; TOP = A
+PUSH	B	     ; TOP = B
+ADD	 	       ; TOP = A+B
+PUSH	C      ; TOP = C
+PUSH	D	     ; TOP = D
+ADD	 	       ; TOP = C+D
+MUL	 	       ; TOP = (C+D)*(A+B)
+POP	X	       ; M[X] = TOP
+
+
+
+# one address instructions
+
+Expression: X = (A+B)*(C+D)
+AC is accumulator
+M[] is any memory location
+M[T] is temporary location
+
+LOAD	A	   ; AC = M[A]
+ADD	B	     ; AC = AC + M[B]
+STORE	T	   ; M[T] = AC
+LOAD	C	   ; AC = M[C]
+ADD	D	     ; AC = AC + M[D]
+MUL	T	     ; AC = AC * M[T]
+STORE	X	   ; M[X] = AC
+
+# two address instructions
+
+Expression: X = (A+B)*(C+D)
+R1, R2 are registers
+M[] is any memory location
+
+MOV	R1, A	  ; R1 = M[A]
+ADD	R1, B	  ; R1 = R1 + M[B]
+MOV	R2, C	  ; R2 = C
+ADD	R2, D	  ; R2 = R2 + D
+MUL	R1, R2	; R1 = R1 * R2
+MOV	X,  R1	; M[X] = R1
+
+# three address instructions
+
+Expression: X = (A+B)*(C+D)
+R1, R2 are registers
+M[] is any memory location
+
+ADD	R1, A, B	; R1 = M[A] + M[B]
+ADD	R2, C, D	; R2 = M[C] + M[D]
+MUL	X, R1, R2	; M[X] = R1 * R2
+
+
+__________________
+https://www.geeksforgeeks.org/introduction-of-general-register-based-cpu-organization/
+

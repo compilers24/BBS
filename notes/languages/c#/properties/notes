@@ -1,0 +1,120 @@
+
+
+the property Title of the string type defines captions of instances ofs Element class.
+```
+public class Element
+{
+  string title;             // this is variable
+  public string Title       // this is property
+  {
+      get
+      {
+        return title;
+      }
+      set
+      {
+        title = value;
+        Repaint();         
+      }
+  }
+  // here we have other fields and methods of the class.
+}
+```
+
+   we have the caption kept in the string 'title', and Title property defines access to it with functions get and set.
+
+   if e is variable of class Element, then in order to change the caption of the element and repaint the object we need to use:
+```
+   e.Title = "hey";
+```
+   This assignment initiates set function call.
+```
+   e.Title += "!";
+```
+   will initiate calls of both functions get and set.
+
+   Still, it is not necessary to use properties to access the caption of the element.
+```
+   public class Element
+   {
+     string title;
+     public string getTitle()
+       {
+         return title;
+       }
+     public void setTitle(string value)
+       {
+         title = value;
+         Repaint();
+       }
+        // other fields and methods
+   }
+```
+
+   here, instead of using ```e.Title = "hey";``` we have to use
+```
+   e.setTitle("hey");
+```
+   and instead of using ```e.Title += "!";``` we have to use
+```
+   e.setTitle(e.getTitle() + "!");
+```
+
+
+
+
+
+   this is more verbose way.
+   on the other hand, it does not hide from the reader, that the actual change of the caption is made by the function, which, except of doing that change, may also do something else.
+
+   also, it's not possible (without reading the definition of the class) to know, if we use methods of the class, or properties.
+
+  ------------------
+
+  how properties are used in object pascal/delphi.
+
+  proposal to use properties in modula-3.
+
+  https://github.com/modula3/cm3/issues/12
+
+  What do you think about implementing properties in Objects?
+
+  ```
+    OBJECT
+      ...
+      PROPERTIES
+        intValue : INTEGER READ GetIntValue() WRITE SetIntValue();
+
+
+  ```
+
+
+  >I wouldn’t mind adding some things like this as long as they are very obviously simple syntactic sugar for existing operations. This looks like something like that…
+
+  >shouldn’t it be, though
+
+```
+   PROPERTIES
+     intValue : INTEGER
+     READ := GetIntValue() : INTEGER
+     WRITE := SetIntValue(to : INTEGER);
+
+```
+
+>to more closely match the syntax for methods.
+
+>Also it won’t work on RECORDs, which is a bit odd.
+
+>I suppose it follows the existing property (which I would not want to break) that you can almost always change a T = REF RECORD … to T = OBJECT … without breaking anything, but not the other way around.
+
+----------------
+
+>One of the problems with properties is that they can break the model that programmers have in their head. They might expect INC(object.property.i) to be very efficient, since it’s incrementing a single value, but the ‘property’ may be a huge record that has to be processed twice (read in and then written back) just to increment the ‘i’ field.
+
+>One of M3’s best features is that it’s a systems programming language that is very efficient and simple. These sorts of features means you couldn’t have confidence in the efficiency of some very basic operations.
+
+>Currently I’m writing code in the Swift programming language which leans heavily on these sorts of features. The worst thing about it is that you have no real idea of what any code is doing, since even simple assignments can be overridden, along with almost every other operation, and you have to hope that the compiler can divine your intentions and optimise it to the simplest case.
+
+btw on modula-3
+
+https://web.archive.org/web/20141005102102/http://www.redbarn.org/node/20

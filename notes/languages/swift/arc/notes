@@ -1,0 +1,15 @@
+0. malloc / free
+you can forget to free
+you can reference freed memory
+
+1. gc
+
+2. smart pointer
+
+3. arc
+
+http://kveeresham.blogspot.com/2014/09/garbage-collection-in-java.html
+https://youtube.com/watch?v=B7yUJdmS5Ks
+https://medium.freecodecamp.org/an-animated-guide-to-how-garbage-collection-algorithms-work-46ccdba2b216
+https://spin.atomicobject.com/2014/09/03/visualizing-garbage-collection-algorithms/
+

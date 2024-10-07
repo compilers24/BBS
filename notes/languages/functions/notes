@@ -1,0 +1,107 @@
+
+usually function looks like:
+
+push ebp
+mov ebp,esp
+sub esp,size_of_local_variables
+...
+somehting something something
+...
+mov esp, ebp
+pop ebp
+ret
+
+https://stackoverflow.com/questions/9692435/assembly-return-address
+
+
+Every time we push something onto the stack with pushl, %esp gets subtracted by 4 so that it points to the new top of the stack (remember, each word is four bytes long, and the stack grows downward). If we want to remove something from the stack, we simply use the popl instruction, which adds 4 to %esp and puts the previous top value in whatever register you specified.
+
+pushl and popl each take one operand - the register to push onto the stack for pushl, or receive the data that is popped off the stack for popl.
+
+If we simply want to access the value on the top of the stack without removing it, we can simply use the %esp register in indirect addressing mode. For example, the following code moves whatever is at the top of the stack into %eax:
+
+movl (%esp), %eax
+
+If we were to just do this:
+
+movl %esp, %eax
+
+then %eax would just hold the pointer to the top of the stack rather than the value at the top. Putting %esp in parenthesis causes the computer to go to indirect addressing mode, and therefore we get the value pointed to by %esp. If we want to access the value right below the top of the stack, we can simply issue this instruction:
+
+movl 4(%esp), %eax
+
+Parameter #N
+...
+Parameter 2
+Parameter 1
+Return Address <--- (%esp)
+
+Upon entering the function:
+
+Each of the parameters of the function have been pushed onto the stack, and finally the return address is there. Now the function itself has some work to do.
+
+The first thing it does is save the current base pointer register, %ebp, by doing pushl %ebp. The base pointer is a special register used for accessing function parameters and local variables. Next, it copies the stack pointer to %ebp by doing
+
+movl %esp, %ebp
+
+This allows you to be able to access the function parameters as fixed indexes from the base pointer. You may think that you can use the stack pointer for this. However, during your program you may do other things with the stack such as pushing arguments to other functions.
+
+Copying the stack pointer into the base pointer at the beginning of a function allows you to always know where your parameters are (and as we will see, local variables too), even while you may be pushing things on and off the stack.
+
+%ebp will always be where the stack pointer was at the beginning of the function, so it is more or less a constant reference to the stack frame
+(the stack frame consists of all of the stack variables used within a function, including parameters, local variables, and the return address).
+
+At this point, the stack looks like this:
+
+Parameter #N   <--- N*4+4(%ebp)
+...
+Parameter 2    <--- 12(%ebp)
+Parameter 1    <--- 8(%ebp)
+Return Address <--- 4(%ebp)
+Old %ebp       <--- (%esp) and (%ebp)
+
+As you can see, each parameter can be accessed using base pointer addressing mode using the %ebp register.
+
+Local variables.
+================
+
+Next, the function reserves space on the stack for any local variables it needs. This is done by simply moving the stack pointer out of the way. Let’s say that we are going to need two words of memory to run a function. We can simply move the stack pointer down two words to reserve the space. This is done like this:
+
+subl $8, %esp
+
+
+Parameter #N     <--- N*4+4(%ebp)
+...
+Parameter 2      <--- 12(%ebp)
+Parameter 1      <--- 8(%ebp)
+Return Address   <--- 4(%ebp)
+Old %ebp         <--- (%ebp)
+Local Variable 1 <--- -4(%ebp)
+Local Variable 2 <--- -8(%ebp) and (%esp)
+
+
+So we can now access all of the data we need for this function by using base pointer addressing using different offsets from %ebp. %ebp was made specifically for this purpose, which is why it is called the base pointer. You can use other registers in base pointer addressing mode, but the x86 architecture makes using the %ebp register a lot faster.
+
+When a function is done executing, it does three things:
+
+* stores it’s return value in %eax.
+* resets the stack to what it was when it was called (it gets rid of the current stack frame and puts the stack frame of the calling code back into effect).
+* returns control back to wherever it was called from. This is done using the ret instruction, which pops whatever value is at the top of the stack, and sets the instruction pointer, %eip, to that value.
+
+So, before a function returns control to the code that called it, it must restore the previous stack frame. Note also that without doing this, ret wouldn’t work, because in our current stack frame, the return address is not at the top of the stack. Therefore, before we return, we have to reset the stack pointer %esp and base pointer %ebp to what they were when the function began. Therefore to return from the function you have to do the following:
+
+movl %ebp, %esp
+popl %ebp
+ret
+
+At this point, you should consider all local variables to be disposed of. The reason is that after you move the stack pointer back, future stack pushes will likely overwrite everything you put there. Therefore, you should never save the address of a local variable past the life of the function it was created in, or else it will be overwritten after the life of it’s stack frame ends.
+
+Control has now beenhanded back to the calling code, which can now examine %eax for the return value. The calling code also needs to pop off all of the parameters it pushed onto the stack in order to get the stack pointer back where it was (you can also simply add 4 * number of paramters to %esp using the addl instruction, if you don’t need the values of the parameters anymore).
+
+REGISTERS!
+
+>When you call a function, you should assume that everything currently in your registers will be wiped out. The only register that is guaranteed to be left with the value it started with is %ebp.
+
+%eax is guaranteed to be overwritten, and the others likely are. If there are registers you want to save before calling a function, you need to save them by pushing them on the stack before pushing the function’s paramters. You can then pop them back off in reverse order after popping off the parameters. Even if you know a function does not overwrite a register you should save it, because future versions of that function may.
+
+

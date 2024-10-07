@@ -1,0 +1,9 @@
+who's responsible for preserving the register state across a function call and return?
+
+* the caller might waste work saving register state that the callee doesn't use.
+
+* the callee might waste work saving register state that the caller wasn't using.
+
+callee-saved registers: %rbx, %rbp, %r12-%r15
+all other registers are caller saved.
+

@@ -1,0 +1,55 @@
+________________________________________________
+|                     %rax                     |
+|______________________________________________|
+|                      |        %eax           |
+|                      |_______________________|
+|                      |           |     %ax   |
+|                      |           |___________|
+|                      |           | %ah | %al |         
+________________________________________________
+
+Byte7 Byte6 Byte5 Byte4 Byte3 Byte2 Byte1 Byte0
+
+
+64bit name      32bit name      16bit name      8bit name(s)
+  %rax            %eax            %ax             %ah, %al
+  %rbx            %ebx            %bx             %bh, %bl
+  %rcx            %ecx            %cx             %ch, %cl
+  %rdx            %edx            %dx             %dh, %dl
+  %rsi            %esi            %si             %sil
+  %rdi            %edi            %di             %dil
+  %rbp            %ebp            %bp             %bpl
+  %rsp            %esp            %sp             %spl
+  %r8             %r8d            %r8w            %r8b
+  %r9             %r9d            %r9w            %r9b
+  %r10            %r10d           %r10w           %10b
+  ....................................................
+  %r15            %r15d           %r15w           %r15b
+
+
+
+1
+
+In x86 registers are encoded by 3 bits, therefore you can choose among 8 registers for each operand. The set of 16-bit and 32-bit registers in order is
+
+    E = { (E)AX, (E)CX, (E)DX, (E)BX, (E)SP, (E)BP, (E)SI, (E)DI }
+
+However when it comes to 8-bit registers the chosen register set was
+
+    B = { AL, CL, DL, BL, AH, CH, DH, BH }
+
+As you can see they traded off the ability to address the low bytes of SP, BP, SI, DI which were deemed less useful at the time (seriously, why would you want the low byte of SP or BP?) and replace them with the high bytes of AX, BX, CX, DX instead which also helps translating 8080 assembly to 8086 directly without any rewrite. See Why are first four x86 GPRs named in such unintuitive order? for more explanation
+
+In 32-bit mode more addressing modes were introduced with the advent of the SIB byte. That makes it possible to free the EBP register up for general use, so the low byte of BP may have some useful use, but Intel didn't change the encoding scheme to simplify the decoder, and for backward compatibility
+
+However when AMD extended the ISA to 64-bit they made many breaking changes. There's more bits to address the registers with the use of the REX prefix so now we have 8 more registers. AMD also allows us to address the above registers' low bytes
+
+    Without REX prefix: use the set B like the old behavior. (The new registers R8-R15 or any of their partial registers aren't accessible at all without a REX prefix)
+    With REX prefix: the set is now B' = { AL, CL, DL, BL, SPL, BPL, SIL, DIL, R8B-R15B }
+
+It's also easy to see why AH/BH/CH/DL cannot be used with REX-prefix, and why you can't mix AH with BPL for example
+
+https://stackoverflow.com/questions/38658677/can-the-lower-byte-of-the-registers-rsi-rdi-rsp-and-rbp-be-directly-addressed
+
+
+also https://www.cs.virginia.edu/~evans/cs216/guides/x86.html

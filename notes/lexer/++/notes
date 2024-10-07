@@ -1,0 +1,9 @@
+
+map<int, vector<int>>
+
+the >> would be recognized as bitwise right shift in a "regular" Lexical Analysis, but it's not correct.
+
+
+https://stackoverflow.com/questions/19106622/compiler-limitation-of-lexical-analysis
+
+https://en.wikipedia.org/wiki/Most_vexing_parse

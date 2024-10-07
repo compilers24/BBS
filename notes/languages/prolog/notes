@@ -1,0 +1,147 @@
+prolog background
+
+created in 1972
+
+* first mainstream logic programming language
+
+* designed in marseille, france
+
+* from "programmation en logique"
+
+* european answer to lisp for ai
+
+learning from prolog #1:
+
+a consistent model:
+
+everything is a fact or a rule
+
+facts:
+
+liz is 92.
+
+```
+age(liz,92).
+age(charles,69).
+age(wills,35).
+age(harry,33).
+
+parent(charles,wills).
+parent(charles,harry).
+parent(liz,charles).
+
+rules:
+
+grandparent(GP,C) :- 
+  parent(GP,P),
+  parent(P,C).
+
+// i. e. is is the grandparent of the child, if it is the parent of the parent, and if the parent is the parent of the child.
+
+isOlder(P1,P2) :-
+  age(P1,A1),
+  age(P2,A2),
+  A1 > A2.
+
+
+learning from prolor #2:
+
+it's declarative.
+
+"what" not "how".
+
+you don't say how to do, you say what to do.
+
+if we ask
+
+is liz's age 92?
+
+age(liz,92).  % is it a fact?
+  true.
+
+age(P, 92).   % P is unbound, so tell me
+  P=liz.
+
+age(liz,A).   % A is unbound
+  A=92.
+
+(unlike sql, it is bidirectional).
+
+//is liz the grandparent of harry?
+
+grandparent(liz,harry).
+  true.
+
+isOlder(wills,liz).
+  false.
+
+//who is liz grandparent of?
+
+grandparent(liz,P).  % P is unbound
+  P=harry.
+  P=wills.
+
+  (we need to ask over and over to get different answers, because P is unbound variable).
+
+isOlder(P,charles).  % P is unbound
+  P=liz.
+
+question: "would this make a good query language as an alternative to sql?"
+
+answer: "yes, it exists and is called datalog"
+
+
+datalog example
+===============
+
+"get the names and addresses of employees who work for at least one project located in houston but whose department is not based in houston."
+
+in sql this will be hard, with joins of tables.
+
+worksOnHoustonProj(Manager) :-   //someone who works on the houston project is
+  works_on(Manager,Proj,_),      //someone who works on the project and
+  project(_,Proj,'Houston',_).   //that project is based in houston.
+
+
+notInHouston(Manager) :-                  //someone who doesn't live in houston
+  employee(_,_,_,Manager,_,_,_,_,_,Dept), //is an employee from the department
+  not dept_based_in(Dept,'Houston').      //and that department is not based in houston.
+
+  then the answer is.
+
+answer(First,Middle,Last,Addr) :- //we want first, middle, last, addr of 
+  employee(First,Middle,Last,Mgr,_,Addr,_,_,_,_), //an employee who has manager
+  worksOnHoustonProj(Mgr), notinHouston(Mgr). /who works in houston but doesn't live in houston.
+
+
+prolog has bi-directional unification.
+
+
+//append contatenates lists
+
+append([1], [2,3], X). % only one answer
+
+X = [1,2,3]  //what is the list?
+
+//what do i have to 2 and 3 to make it 1,2,3?
+
+append(X, [2,3], [1,2,3]).   % only one answer
+X = [1]                      //answer
+
+now multiple answers:
+
+append(X, Y, [1,2,3]).      % multiple answers
+
+X = []      Y = [1,2,3]
+X = [1]     Y = [2,3]
+X = [1,2]   Y = [3]
+X = [1,2,3] Y = []
+
+demo.
+
+https://www.youtube.com/watch?v=bU1vbhdFFPc
+https://www.youtube.com/watch?v=XfVOCJFreJ0
+https://www.youtube.com/watch?v=mRwHZTNGdoY
+  
+
+

@@ -1,0 +1,241 @@
+https://www.quora.com/Systems-Programming/What-is-the-exact-difference-between-dynamic-loading-and-dynamic-linking/answer/Jeff-Darcy
+https://stackoverflow.com/questions/10052464/difference-between-dynamic-loading-and-dynamic-linking
+http://www.yolinux.com/TUTORIALS/LibraryArchives-StaticAndDynamic.html
+
+Benefits
+========
+
+* Component reuse: update one library, shared resource takes up less disk space.
+* Version management: Linux libraries can cohabitate old and new versions on a single system.
+* Component Specialization: niche and specialized developers can focus on their core competency on a single library. Simplifies testing and verification.
+
+Library types
+=============
+
+
+* Static libraries (.a): Library of object code which is linked with, and becomes part of the application.
+
+* Dynamically linked shared object libraries (.so): There is only one form of this library but it can be used in two ways.
+
+* Dynamically linked at run time. The libraries must be available during compile/link phase. The shared objects are not included into the executable component but are tied to the execution.
+
+* Dynamically loaded/unloaded and linked during execution (i.e. browser plug-in) using the dynamic linking loader system functions.
+
+
+Naming conventions
+==================
+
+Libraries are typically named with the prefix "lib". This is true for all the C standard libraries. When linking, the command line reference to the library will not contain the library prefix or suffix.
+
+Consider the following compile and link command: gcc src-file.c -lm -lpthread
+The libraries referenced in this example for inclusion during linking are the math library ("m") and the thread library ("pthread"). They are found in /usr/lib/libm.a and /usr/lib/libpthread.a.
+
+Note: The GNU compiler now has the command line option "-pthread" while older versions of the compiler specify the pthread library explicitly with "-lpthread". Thus now you are more likely to see gcc src-file.c -lm -pthread
+
+Static
+======
+
+Note for MS/Windows developers: The Linux/Unix ".a" library is conceptually the same as the Visual C++ static ".lib" libraries.
+
+Dynamically linked
+==================
+
+
+*  Create object code
+*  Create library
+*  Optional: create default version using a symbolic link.
+
+from man gcc:
+
+```
+       -Wl,option
+           Pass option as an option to the linker.  If option contains commas,
+           it is split into multiple options at the commas.  You can use this
+           syntax to pass an argument to the option.  For example,
+           -Wl,-Map,output.map passes -Map output.map to the linker.  When
+           using the GNU linker, you can also get the same effect with
+           -Wl,-Map=output.map.
+```
+
+```
+-Wall: include warnings. See man page for warnings specified.
+-fPIC: Compiler directive to output position independent code, a characteristic required by shared libraries. Also see "-fpic".
+-shared: Produce a shared object which can then be linked with other objects to form an executable.
+-Wl,options: Pass options to linker.
+In this example the options to be passed on to the linker are: "-soname libctest.so.1". The name passed with the "-o" option is passed to gcc.
+Option -o: Output of operation. In this case the name of the shared object to be output will be "libctest.so.1.0"
+```
+
+ldd prog
+
+/etc/ld.so.conf
+
+The fix is to resolve dependencies of the last two libraries when linking the library libname-of-lib.so:
+
+* Add the unresolved library path in /etc/ld.so.conf.d/name-of-lib-x86_64.conf and/or /etc/ld.so.conf.d/name-of-lib-i686.conf
+* Reload the library cache (/etc/ld.so.cache) with the command: sudo ldconfig
+    or
+* Add library and path explicitly to the compiler/linker command: -lname-of-lib -L/path/to/lib
+    or
+* Add the library path to the environment variable to fix run-time dependency:
+    export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/path/to/lib
+
+Run Program:
+
+*  Set path: export LD_LIBRARY_PATH=/opt/lib:$LD_LIBRARY_PATH
+*  Run: prog
+
+
+Library path
+=============
+
+/etc/ld.so.conf
+ldconfig
+
+or
+
+ldconfig -n /opt/lib
+Where /opt/lib is the directory containing your library libctest.so
+(When developing and just adding your current directory: ldconfig -n . Link with -L.)
+
+This will NOT permanently configure the system to include this directory. The information will be lost upon system reboot.
+
+or
+
+Specify the environment variable LD_LIBRARY_PATH to point to the directory paths containing the shared object library. This will specify to the run time loader that the library paths will be used during execution to resolve dependencies.
+(Linux/Solaris: LD_LIBRARY_PATH, SGI: LD_LIBRARYN32_PATH, AIX: LIBPATH, Mac OS X: DYLD_LIBRARY_PATH, HP-UX: SHLIB_PATH)
+
+Example (bash shell): export LD_LIBRARY_PATH=/opt/lib:$LD_LIBRARY_PATH or add to your ~/.bashrc file:
+
+
+```
+...
+if [ -d /opt/lib ];
+then
+   LD_LIBRARY_PATH=/opt/lib:$LD_LIBRARY_PATH
+fi
+
+...
+
+export LD_LIBRARY_PATH
+```
+
+library info:
+=============
+
+ar tf /usr/lib/x86_64-linux-gnu/libjpeg.a
+
+This will list all of the object files held in the archive library:
+
+jlibinit.o
+jcapimin.o
+jcapistd.o
+jccoefct.o
+jccolor.o
+jcdctmgr.o
+jchuff.o
+jcinit.o
+...
+...
+
+
+
+inm: list symbols: object files, archive library and shared library
+
+The command "nm" lists symbols contained in object files:
+
+ nm file.o
+
+The command "nm" lists symbols contained in the archive library:
+Object symbols in static archive libraries are categorized using the source and object file hierarchy of the library:
+
+ nm /usr/lib/x86_64-linux-gnu/libjpeg.a
+
+jlibinit.o:
+0000000000000000 B auxv
+                 U fclose
+                 U fopen
+                 U fread
+                 U getpagesize
+0000000000000000 T libjpeg_general_init
+                 U malloc
+                 U perror
+
+jcapimin.o:
+                 U jinit_marker_writer
+                 U jinit_memory_mgr
+0000000000000000 T jpeg_CreateCompress
+                 U jpeg_abort
+0000000000000240 T jpeg_abort_compress
+                 U jpeg_destroy
+0000000000000230 T jpeg_destroy_compress
+00000000000002a0 T jpeg_finish_compress
+                 U jpeg_natural_order
+...
+...
+     
+
+Symbol Type 	Description
+A 	The symbol's value is absolute, and will not be changed by further linking.
+B 	Un-initialized data section
+D 	Initialized data section
+T 	Normal code section
+U 	Undefined symbol used but not defined. Dependency on another library.
+W 	Doubly defined symbol. If found, allow definition in another library to resolve dependency.
+
+readelf: list symbols in shared library
+
+The command "readelf" command to list symbols contained in a shared library:
+Use the command readelf -s /usr/lib64/libjpeg.so
+
+Symbol table '.dynsym' contains 144 entries:
+   Num:    Value          Size Type    Bind   Vis      Ndx Name
+     0: 0000000000000000     0 NOTYPE  LOCAL  DEFAULT  UND 
+     1: 0000000000003b30     0 SECTION LOCAL  DEFAULT   10 
+     2: 0000000000000000     0 FUNC    GLOBAL DEFAULT  UND getenv@GLIBC_2.2.5 (4)
+     3: 0000000000000000     0 FUNC    GLOBAL DEFAULT  UND free@GLIBC_2.2.5 (4)
+     4: 0000000000000000     0 FUNC    GLOBAL DEFAULT  UND ferror@GLIBC_2.2.5 (4)
+     5: 0000000000000000     0 FUNC    GLOBAL DEFAULT  UND fread@GLIBC_2.2.5 (4)
+     6: 0000000000000000     0 FUNC    GLOBAL DEFAULT  UND fclose@GLIBC_2.2.5 (4)
+     7: 0000000000000000     0 FUNC    GLOBAL DEFAULT  UND __stack_chk_fail@GLIBC_2.4 (5)
+     8: 0000000000000000     0 FUNC    GLOBAL DEFAULT  UND memset@GLIBC_2.2.5 (4)
+     9: 0000000000000000     0 NOTYPE  WEAK   DEFAULT  UND __gmon_start__
+...
+...
+
+
+versioning
+==========
+
+nm csub1.o
+
+00000000 T ctest1
+
+DL
+==
+
+ Explanation:
+
+    dlopen("/opt/lib/libctest.so", RTLD_LAZY);
+    Open shared library named "libctest.so".
+    The second argument indicates the binding. See include file dlfcn.h.
+    Returns NULL if it fails.
+    Options:
+        RTLD_LAZY: If specified, Linux is not concerned about unresolved symbols until they are referenced.
+        RTLD_NOW: All unresolved symbols resolved when dlopen() is called.
+        RTLD_GLOBAL: Make symbol libraries visible.
+    dlsym(lib_handle, "ctest1");
+    Returns address to the function which has been loaded with the shared library..
+    Returns NULL if it fails.
+    Note: When using C++ functions, first use nm to find the "mangled" symbol name or use the extern "C" construct to avoid name mangling.
+    i.e. extern "C" void function-name();
+
+
+ Man pages:
+
+    dlopen() - gain access to an executable object file
+    dclose() - close a dlopen object
+    dlsym() - obtain the address of a symbol from a dlopen object
+    dlvsym() - Programming interface to dynamic linking loader.
+    dlerror() - get diagnostic information
+

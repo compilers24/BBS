@@ -1,0 +1,152 @@
+\ and ( are ordinary Forth words and therefore have to be separated with white space from the following text. 
+
+
++ - / * mod sqrt
+
+dup
+
+swap
+
+drop
+
+negate
+
+over
+
+nip
+
+tuck
+
+
+5 5 * 4 4 * + . 41  ok
+
+: s2 dup * swap dup * + ;
+
+4 5 s2 .
+
+: squared ( n -- n^2 )
+        dup * ;
+
+5 squared .
+7 squared .        
+
+: cubed ( n -- n^3 )
+dup squared * ;
+
+-5 cubed .
+
+: fourth-power ( n -- n^4 )
+squared squared ;
+3 fourth-power .
+
+by convention the comment after the name of a definition describes the stack effect: The part in front of the `--' describes the state of the stack before the execution of the definition, i.e., the parameters that are passed into the colon definition; the part behind the `--' is the state of the stack after the execution of the definition, i.e., the results of the definition. The stack comment only shows the top stack items that the definition accesses and/or changes.
+
+
+
+
+decompilation
+============
+
+see squared
+
+see .
+
+see +
+
+types
+===
+
+the names of the operations are not overloaded; so similar operations on different types need different names; e.g., + adds integers, and you have to use f+ to add floating-point numbers. The following prefixes are often used for related operations on different types:
+
+(none)
+    signed integer
+u
+    unsigned integer
+c
+    character
+d
+    signed double-cell integer
+ud, du
+    unsigned double-cell integer
+2
+    two cells (not-necessarily double-cell numbers)
+m, um
+    mixed single-cell and double-cell operations
+f
+    floating-point (note that in stack comments `f' represents flags, and `r' represents FP numbers).
+
+
+: swap { a b -- b a }
+       b a ;
+     1 2 swap .s 2drop
+
+bool
+===
+
+1 1 = .
+1 0= .
+0 1 < .
+0 0 < .
+-1 1 u< . \ type error, u< interprets -1 as large unsigned number
+-1 1 < .
+
+     1 2 and .
+     1 2 or .
+     1 3 xor .
+     1 invert .
+
+You can convert a zero/non-zero flag into a canonical flag with 0<> (and complement it on the way with 0=).
+
+     1 0= .
+     1 0<> .
+
+conditionals
+=========
+ < compares the top two stack elements and produces a flag:
+
+     1 2 < .
+     2 1 < .
+     1 1 < .
+
+
+
+
+     : abs ( n1 -- +n2 )
+         dup 0 < if
+             negate
+         endif ;
+     5 abs .
+     -5 abs .
+
+if takes a flag from the stack. If the flag is non-zero (true), the following code is performed, otherwise execution continues after the endif (or else).
+
+ : min ( n1 n2 -- n )
+       2dup < if
+         drop
+       else
+         nip
+       endif ;
+     2 3 min .
+     3 2 min .
+
+: bart ." i will not do anything bad ever again" ;
+
+bart
+bart bart
+
+
+gforth test.fs -e by
+
+while (x > 3) { print(x); x--; }
+
+\ Assuming x is on the top of the stack.
+begin dup 3 > while dup . 1- repeat
+
+\ Or if x is in memory.
+begin x @ 3 > while x ? -1 x +! repeat
+
+while (predicate) { expression(s) }
+
+begin predicate while expressions repeat
+
+

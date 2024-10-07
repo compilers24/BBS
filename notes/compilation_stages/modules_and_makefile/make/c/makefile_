@@ -1,0 +1,5 @@
+
+
+
+scanner.class: scanner.java
+							javac scanner.java
